@@ -3,6 +3,8 @@ package com.intuit.craft.urlshortner.cache.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -86,24 +88,24 @@ public class RedisCacheImpl implements DistributedCache, Locker {
 
     @Override
     public RedisAtomicInteger atomicInteger(String key) {
-        return new RedisAtomicInteger(key, redisTemplate.getConnectionFactory());
+        return new RedisAtomicInteger(key, Objects.requireNonNull(redisTemplate.getConnectionFactory()));
     }
 
     @Override
     public RedisAtomicInteger atomicInteger(String key, long ttl, TimeUnit timeUnit) {
-        RedisAtomicInteger atomicInteger = new RedisAtomicInteger(key, redisTemplate.getConnectionFactory());
+        RedisAtomicInteger atomicInteger = new RedisAtomicInteger(key, Objects.requireNonNull(redisTemplate.getConnectionFactory()));
         atomicInteger.expire(ttl, timeUnit);
         return atomicInteger;
     }
 
     @Override
     public RedisAtomicLong atomicLong(String key) {
-        return new RedisAtomicLong(key, redisTemplate.getConnectionFactory());
+        return new RedisAtomicLong(key, Objects.requireNonNull(redisTemplate.getConnectionFactory()));
     }
 
     @Override
     public RedisAtomicLong atomicLong(String key, long ttl, TimeUnit timeUnit) {
-        RedisAtomicLong atomicInteger = new RedisAtomicLong(key, redisTemplate.getConnectionFactory());
+        RedisAtomicLong atomicInteger = new RedisAtomicLong(key, Objects.requireNonNull(redisTemplate.getConnectionFactory()));
         atomicInteger.expire(ttl, timeUnit);
         return atomicInteger;
     }

@@ -1,5 +1,6 @@
 package com.intuit.craft.urlshortner.service.impl;
 
+import com.intuit.craft.urlshortner.cache.Cache;
 import com.intuit.craft.urlshortner.models.dto.request.ShortenUrlRequest;
 import com.intuit.craft.urlshortner.repository.UrlDataAccess;
 import com.intuit.craft.urlshortner.service.Conversion;
@@ -15,6 +16,7 @@ public class UrlServiceImpl implements UrlService {
 
     private final UrlDataAccess urlDao;
     private final Conversion conversion;
+    private final Cache cache;
 
     HashMap<String, Integer> ltos;
     HashMap<Integer, String> stol;
