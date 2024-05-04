@@ -14,6 +14,7 @@ import com.intuit.craft.urlshortner.exceptions.fatal.CacheOperationException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.support.atomic.RedisAtomicInteger;
 import org.springframework.data.redis.support.atomic.RedisAtomicLong;
 import org.springframework.stereotype.Component;
@@ -127,5 +128,8 @@ public class RedisCacheImpl implements DistributedCache, Locker {
         delete(key);
     }
 
-
+    @Override
+    public RedisAtomicInteger atomicIntegerWithValue(String key, Integer initialValue) {
+        return new RedisAtomicInteger(key, Objects.requireNonNull(redisTemplate.getConnectionFactory()), initialValue);
+    }
 }

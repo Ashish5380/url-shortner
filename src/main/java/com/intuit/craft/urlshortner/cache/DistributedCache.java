@@ -26,6 +26,14 @@ public interface DistributedCache extends Cache {
      */
     RedisAtomicInteger atomicInteger(String key, long ttl, TimeUnit timeUnit);
 
+    /** Creates a RedisAtomicInteger at the specified key and initial value.
+     *
+     * @param key           the key for the atomic integer.
+     * @param initialValue  the initial value for the atomic integer.
+     * @return a RedisAtomicInteger instance associated with the given key and specified value.
+     */
+    RedisAtomicInteger atomicIntegerWithValue(String key, Integer initialValue);
+
     /**
      * Creates a RedisAtomicLong at the specified key.
      * If the key does not already exist, it is initialized to zero.

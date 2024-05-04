@@ -5,6 +5,8 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @SuperBuilder
@@ -14,11 +16,9 @@ public class UrlEntity extends BaseEntity{
 
     String shortUrl;
 
-    String customPrefix;
-
-    Integer tps;
-
     String userId;
 
-    Long baseValue;
+    Integer baseValue;
+
+    LocalDateTime expiry;
 }

@@ -12,5 +12,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class UserEntity extends BaseEntity{
     String name;
     String email;
-
+    Integer tps;
+    String customPrefix;
 }

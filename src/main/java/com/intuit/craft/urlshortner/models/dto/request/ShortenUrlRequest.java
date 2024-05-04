@@ -12,8 +12,6 @@ import lombok.Setter;
 public class ShortenUrlRequest {
 
     private String url;
-
-    private Long tps;
-
-    private String customPrefix;
+    private String userId;
+    Integer expiry;
 }

@@ -4,5 +4,5 @@ public interface Conversion {
 
     Integer decode(String input);
 
-    String encode(String input);
+    String encode(String input, Integer counter);
 }
