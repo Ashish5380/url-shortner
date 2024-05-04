@@ -1,7 +1,7 @@
 package com.intuit.craft.urlshortner.api.controller;
 
 import com.intuit.craft.urlshortner.api.HealthApi;
-import com.intuit.craft.urlshortner.models.dto.GenericResponse;
+import com.intuit.craft.urlshortner.models.dto.response.GenericResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 

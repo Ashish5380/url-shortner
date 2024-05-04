@@ -13,6 +13,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.support.atomic.RedisAtomicInteger;
+import org.springframework.data.redis.support.atomic.RedisAtomicLong;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -91,6 +92,18 @@ public class RedisCacheImpl implements DistributedCache, Locker {
     @Override
     public RedisAtomicInteger atomicInteger(String key, long ttl, TimeUnit timeUnit) {
         RedisAtomicInteger atomicInteger = new RedisAtomicInteger(key, redisTemplate.getConnectionFactory());
+        atomicInteger.expire(ttl, timeUnit);
+        return atomicInteger;
+    }
+
+    @Override
+    public RedisAtomicLong atomicLong(String key) {
+        return new RedisAtomicLong(key, redisTemplate.getConnectionFactory());
+    }
+
+    @Override
+    public RedisAtomicLong atomicLong(String key, long ttl, TimeUnit timeUnit) {
+        RedisAtomicLong atomicInteger = new RedisAtomicLong(key, redisTemplate.getConnectionFactory());
         atomicInteger.expire(ttl, timeUnit);
         return atomicInteger;
     }

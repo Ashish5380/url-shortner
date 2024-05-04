@@ -1,4 +1,4 @@
-package com.intuit.craft.urlshortner.models.dto;
+package com.intuit.craft.urlshortner.models.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,9 +9,11 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ErrorResponseDto {
+public class ShortenUrlRequest {
 
-  private Boolean retry;
+    private String url;
 
-  private String message;
+    private Long tps;
+
+    private String customPrefix;
 }

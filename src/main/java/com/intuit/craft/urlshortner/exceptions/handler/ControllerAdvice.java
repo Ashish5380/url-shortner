@@ -2,8 +2,8 @@ package com.intuit.craft.urlshortner.exceptions.handler;
 
 import com.intuit.craft.urlshortner.exceptions.FatalException;
 import com.intuit.craft.urlshortner.exceptions.ServiceException;
-import com.intuit.craft.urlshortner.models.dto.ErrorResponseDto;
-import com.intuit.craft.urlshortner.models.dto.GenericResponse;
+import com.intuit.craft.urlshortner.models.dto.response.ErrorResponseDto;
+import com.intuit.craft.urlshortner.models.dto.response.GenericResponse;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
