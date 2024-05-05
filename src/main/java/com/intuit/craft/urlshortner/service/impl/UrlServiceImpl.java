@@ -54,8 +54,9 @@ public class UrlServiceImpl implements UrlService {
         }
     }
 
+    @Override
     public String convertToLongUrl(String url) {
-
+        return String.valueOf(cache.get(url,String.class));
     }
 
 }

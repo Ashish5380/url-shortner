@@ -8,7 +8,7 @@ import org.springframework.web.servlet.view.RedirectView;
 @RequestMapping("/url")
 public interface UrlApi {
 
-    @GetMapping("/resolve/{path}")
+    @GetMapping("/r/{path}")
     RedirectView resolveUrl(@PathVariable("path") String path);
 
     @PostMapping
