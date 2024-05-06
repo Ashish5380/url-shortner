@@ -1,6 +1,7 @@
 package com.intuit.craft.urlshortner.service.impl;
 
 import com.intuit.craft.urlshortner.cache.Cache;
+import com.intuit.craft.urlshortner.constants.StringConstants;
 import com.intuit.craft.urlshortner.exceptions.service.UserCreationException;
 import com.intuit.craft.urlshortner.exceptions.service.UserNotFoundException;
 import com.intuit.craft.urlshortner.exceptions.service.UserUpdationException;
@@ -43,7 +44,7 @@ public class UserServiceImpl implements UserService {
                             .build());
             return userId;
         }else{
-            throw new UserCreationException("Unable to create user in the system", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new UserCreationException(StringConstants.Error.USER_CREATION_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
@@ -59,7 +60,7 @@ public class UserServiceImpl implements UserService {
                                 .customPrefix(user.get().getCustomPrefix())
                         .build());
             } else {
-                throw new UserNotFoundException("User id provided does not exist", HttpStatus.BAD_REQUEST);
+                throw new UserNotFoundException(StringConstants.Error.USER_ID_NOT_EXIST, HttpStatus.BAD_REQUEST);
             }
         }
         UserCacheBO cacheObject = userCacheBO.get();

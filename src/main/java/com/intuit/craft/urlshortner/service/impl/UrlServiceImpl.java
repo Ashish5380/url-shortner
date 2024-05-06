@@ -2,6 +2,7 @@ package com.intuit.craft.urlshortner.service.impl;
 
 import com.intuit.craft.urlshortner.cache.Cache;
 import com.intuit.craft.urlshortner.cache.DistributedCache;
+import com.intuit.craft.urlshortner.constants.StringConstants;
 import com.intuit.craft.urlshortner.exceptions.service.UrlCreationException;
 import com.intuit.craft.urlshortner.exceptions.service.UrlNotFoundException;
 import com.intuit.craft.urlshortner.models.bo.ShortenUrlBO;
@@ -48,7 +49,7 @@ public class UrlServiceImpl implements UrlService {
             cache.put(suffix,request.getUrl());
             return shortUrlString(suffix, request.getUserId());
         }else{
-            throw new UrlCreationException("Error while creating short url", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new UrlCreationException(StringConstants.Error.URL_CREATION_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -64,7 +65,7 @@ public class UrlServiceImpl implements UrlService {
                 cache.put(urlEntity.get().getShortUrl(), urlEntity.get().getActualUrl());
                 return urlEntity.get().getActualUrl();
             }else{
-                throw new UrlNotFoundException("Request url not found", HttpStatus.BAD_REQUEST);
+                throw new UrlNotFoundException(StringConstants.Error.URL_NOT_FOUND, HttpStatus.BAD_REQUEST);
             }
         }
     }
@@ -82,7 +83,7 @@ public class UrlServiceImpl implements UrlService {
             cache.put(suffix,urlRequest.getUrl());
             return shortUrlString(suffix,userId);
         }else{
-            throw new UrlNotFoundException("Provided url does not exist in the system", HttpStatus.BAD_REQUEST);
+            throw new UrlNotFoundException(StringConstants.Error.URL_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }
     }
 
