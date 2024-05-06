@@ -7,44 +7,41 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.support.atomic.RedisAtomicLong;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+
+import static com.intuit.craft.urlshortner.constants.ServiceConstants.DEFAULT_TPS;
+
 @Service
 @RequiredArgsConstructor
 public class RateLimiterServiceImpl implements RateLimiter {
 
-    // Leaky bucket rate limiting / token bucket rate limiting / window based limiting
-//    private final DistributedCache cache;
-//
-//    @Override
-//    public boolean isTooManyRequests(final String urlCode) {
-//        long currentTime = System.currentTimeMillis();
-//        // Calculate the number of tokens to add based on elapsed time since the last refill.
-//        long tokensToAdd = ((currentTime - lastRefillTimestamp) / windowUnit) * threshold;
-//
-//        // Refill the bucket with the calculated number of tokens.
-//        if (tokensToAdd > 0) {
-//            // Ensure the bucket does not exceed its capacity.
-//            tokens.set(Math.min(threshold, tokens.addAndGet(tokensToAdd)));
-//            // Update the refill timestamp.
-//            lastRefillTimestamp = currentTime;
-//        }
-//
-//        // Attempt to acquire a token.
-//        if (tokens.get() > 0) {
-//            // Decrement the token count and grant access.
-//            tokens.decrementAndGet();
-//            return true;
-//        }
-//
-//        // Token bucket is empty; deny access.
-//        return false;
-//    }
-//
-//    @Override
-//    public void updateLimit(final String urlCode, final long limit) {
-//
-//    }
-//
-//    private RedisAtomicLong getOrInitializeBucket(final String code, final long tps) {
-//        RedisAtomicLong currentTps = cache.atomicLong(code);
-//    }
+    // token bucket rate limiting
+    private final DistributedCache cache;
+
+    @Override
+    public boolean isTooManyRequests(final String urlCode) {
+        RedisAtomicLong bucket = getOrInitializeBucket(urlCode, DEFAULT_TPS);
+
+        long newCount = bucket.decrementAndGet();
+        if (newCount < 0) {
+            bucket.incrementAndGet();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void updateLimit(final String urlCode, final long limit) {
+        getOrInitializeBucket(urlCode, limit);
+    }
+
+    private RedisAtomicLong getOrInitializeBucket(final String code, final long tps) {
+        RedisAtomicLong currentTps = cache.atomicLong(code, 1L, TimeUnit.SECONDS);
+        if (currentTps.get() == 0) {
+            // Initialize bucket with tokens equal to the rate limit
+            currentTps.set(tps);
+        }
+        return currentTps;
+    }
 }

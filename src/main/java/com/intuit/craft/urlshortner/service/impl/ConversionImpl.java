@@ -1,17 +1,14 @@
 package com.intuit.craft.urlshortner.service.impl;
 
-import com.intuit.craft.urlshortner.cache.DistributedCache;
 import com.intuit.craft.urlshortner.service.Conversion;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import static com.intuit.craft.urlshortner.constants.ServiceConstants.ALLOWED_CHARACTERS;
-import static com.intuit.craft.urlshortner.constants.ServiceConstants.COUNTER_KEY;
 
 @Service
 @RequiredArgsConstructor
 public class ConversionImpl implements Conversion {
-    private final DistributedCache distributedCache;
 
     @Override
     public String encode(String input, Integer counter){
@@ -20,7 +17,6 @@ public class ConversionImpl implements Conversion {
 
     @Override
     public Integer decode(String input){
-        input = input.substring("http://tiny.url/".length());
         return base62ToBase10(input);
     }
 

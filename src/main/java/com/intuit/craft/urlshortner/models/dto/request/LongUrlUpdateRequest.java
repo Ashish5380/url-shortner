@@ -7,9 +7,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class ShortenUrlRequest {
-
+public class LongUrlUpdateRequest {
     private String url;
-    private String userId;
     Integer expiry;
+    String shortUrl;
 }

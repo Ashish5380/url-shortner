@@ -1,5 +1,6 @@
 package com.intuit.craft.urlshortner.api;
 
+import com.intuit.craft.urlshortner.models.dto.request.LongUrlUpdateRequest;
 import com.intuit.craft.urlshortner.models.dto.request.ShortenUrlRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,6 @@ public interface UrlApi {
     @PostMapping
     ResponseEntity<?> shortenUrl(@RequestBody ShortenUrlRequest request);
 
-    @PutMapping("/{code}")
-    ResponseEntity<?> updateshortenedUrl(@RequestBody ShortenUrlRequest request);
+    @PutMapping("/{userId}")
+    ResponseEntity<?> updateShortenedUrl(@RequestBody LongUrlUpdateRequest request, @PathVariable("userId") String userId);
 }

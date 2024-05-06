@@ -7,4 +7,8 @@ import java.util.Optional;
 
 public interface UrlDataAccess {
     Optional<UrlEntity> saveToDB(ShortenUrlBO request);
+
+    Optional<UrlEntity> findByBasePath(Integer base);
+
+    void upsertUrl(UrlEntity urlEntity);
 }

@@ -8,8 +8,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class CreateUserRequest {
-
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class UpdateUserRequest {
+    String id;
     String name;
     String email;
     Integer tps;

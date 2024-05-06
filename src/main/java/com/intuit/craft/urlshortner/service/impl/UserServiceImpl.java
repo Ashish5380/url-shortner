@@ -2,14 +2,17 @@ package com.intuit.craft.urlshortner.service.impl;
 
 import com.intuit.craft.urlshortner.cache.Cache;
 import com.intuit.craft.urlshortner.exceptions.service.UserCreationException;
+import com.intuit.craft.urlshortner.exceptions.service.UserNotFoundException;
+import com.intuit.craft.urlshortner.exceptions.service.UserUpdationException;
 import com.intuit.craft.urlshortner.models.bo.UserBO;
 import com.intuit.craft.urlshortner.models.bo.UserCacheBO;
 import com.intuit.craft.urlshortner.models.dto.request.CreateUserRequest;
+import com.intuit.craft.urlshortner.models.dto.request.UpdateUserRequest;
 import com.intuit.craft.urlshortner.models.entity.UserEntity;
 import com.intuit.craft.urlshortner.repository.UserDataAccess;
 import com.intuit.craft.urlshortner.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
+import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -18,8 +21,10 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final UserDataAccess userDataAccess;
+
     private final Cache cache;
+
+    private final UserDataAccess userDataAccess;
 
     @Override
     public String createUser(CreateUserRequest createUserRequest){
@@ -41,6 +46,41 @@ public class UserServiceImpl implements UserService {
             throw new UserCreationException("Unable to create user in the system", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+    }
+
+    @Override
+    public UserCacheBO getUserCachedObject(String userId){
+        Optional<UserCacheBO> userCacheBO = cache.get(userId, UserCacheBO.class);
+        if(!userCacheBO.isPresent()) {
+            Optional<UserEntity> user = userDataAccess.findUserById(userId);
+            if (user.isPresent()) {
+                userCacheBO = Optional.ofNullable(UserCacheBO.builder()
+                                .tps(user.get().getTps())
+                                .customPrefix(user.get().getCustomPrefix())
+                        .build());
+            } else {
+                throw new UserNotFoundException("User id provided does not exist", HttpStatus.BAD_REQUEST);
+            }
+        }
+        UserCacheBO cacheObject = userCacheBO.get();
+        cache.put(userId,cacheObject);
+        return cacheObject;
+    }
+
+    @Override
+    public String updateUser(UpdateUserRequest updateUserRequest){
+        userDataAccess.upsertUser(UserEntity.builder()
+                .id(new ObjectId(updateUserRequest.getId()))
+                .name(updateUserRequest.getName())
+                .tps(updateUserRequest.getTps())
+                .email(updateUserRequest.getEmail())
+                .customPrefix(updateUserRequest.getCustomPrefix())
+                .build());
+        UserCacheBO userCacheBO = getUserCachedObject(updateUserRequest.getId());
+        userCacheBO.setTps(updateUserRequest.getTps());
+        userCacheBO.setCustomPrefix(updateUserRequest.getCustomPrefix());
+        cache.put(updateUserRequest.getId(),userCacheBO);
+        return updateUserRequest.getId();
     }
 
 

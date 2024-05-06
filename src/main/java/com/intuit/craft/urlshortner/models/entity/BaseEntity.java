@@ -1,5 +1,6 @@
 package com.intuit.craft.urlshortner.models.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,9 +24,11 @@ public class BaseEntity {
     @GeneratedValue
     protected ObjectId id;
 
+    @JsonIgnore
     @CreatedDate
     protected LocalDateTime createdAt;
 
+    @JsonIgnore
     @LastModifiedDate
     protected LocalDateTime updatedAt;
 }

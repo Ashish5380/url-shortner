@@ -130,6 +130,8 @@ public class RedisCacheImpl implements DistributedCache, Locker {
 
     @Override
     public RedisAtomicInteger atomicIntegerWithValue(String key, Integer initialValue) {
-        return new RedisAtomicInteger(key, Objects.requireNonNull(redisTemplate.getConnectionFactory()), initialValue);
+        ValueOperations<String, String> ops = redisTemplate.opsForValue();
+        ops.setIfAbsent(key, String.valueOf(initialValue));
+        return new RedisAtomicInteger(key, Objects.requireNonNull(redisTemplate.getConnectionFactory()));
     }
 }

@@ -8,4 +8,8 @@ import java.util.Optional;
 public interface UserDataAccess {
 
     Optional<UserEntity> addToDB(UserBO userBO);
+
+    Optional<UserEntity> findUserById(String userId);
+
+    void upsertUser(UserEntity entity);
 }
