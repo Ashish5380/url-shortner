@@ -14,6 +14,8 @@ import com.intuit.craft.urlshortner.repository.UserDataAccess;
 import com.intuit.craft.urlshortner.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +24,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
     private final Cache cache;
 
     private final UserDataAccess userDataAccess;
@@ -38,12 +40,16 @@ public class UserServiceImpl implements UserService {
                         .build());
         if(user.isPresent()){
             String userId = user.get().getId().toHexString();
+            LOGGER.info("[createUser] : created user with email {} with user-id : {}",createUserRequest.getEmail(),
+                    userId);
             cache.put(userId, UserCacheBO.builder()
                             .customPrefix(user.get().getCustomPrefix())
                             .tps(user.get().getTps())
                             .build());
             return userId;
         }else{
+            LOGGER.info("[createUser]: error : {} for user with email : {}",StringConstants.Error.USER_CREATION_ERROR,
+                    createUserRequest.getEmail());
             throw new UserCreationException(StringConstants.Error.USER_CREATION_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
@@ -60,6 +66,8 @@ public class UserServiceImpl implements UserService {
                                 .customPrefix(user.get().getCustomPrefix())
                         .build());
             } else {
+                LOGGER.error("[getUserCachedObject]: error getting user cache object : {} for user : {}",
+                        StringConstants.Error.USER_ID_NOT_EXIST, userId);
                 throw new UserNotFoundException(StringConstants.Error.USER_ID_NOT_EXIST, HttpStatus.BAD_REQUEST);
             }
         }

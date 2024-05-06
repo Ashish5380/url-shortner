@@ -15,6 +15,8 @@ import com.intuit.craft.urlshortner.service.Conversion;
 import com.intuit.craft.urlshortner.service.UrlService;
 import com.intuit.craft.urlshortner.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +29,7 @@ import static com.intuit.craft.urlshortner.constants.ServiceConstants.URL_PREFIX
 @Service
 @RequiredArgsConstructor
 public class UrlServiceImpl implements UrlService {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(UrlServiceImpl.class);
     private final UrlDataAccess urlDao;
     private final Conversion conversion;
     private final DistributedCache distributedCache;
@@ -47,8 +49,10 @@ public class UrlServiceImpl implements UrlService {
                 .build());
         if(entity.isPresent()){
             cache.put(suffix,request.getUrl());
+            LOGGER.info("[convertToShortUrl]: created short url suffix is: {}" , suffix);
             return shortUrlString(suffix, request.getUserId());
         }else{
+            LOGGER.error("[convertToShortUrl]: {} for long url {}",StringConstants.Error.URL_CREATION_ERROR, request.getUrl());
             throw new UrlCreationException(StringConstants.Error.URL_CREATION_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -81,8 +85,10 @@ public class UrlServiceImpl implements UrlService {
             existingObj.setActualUrl(urlRequest.getUrl());
             urlDao.upsertUrl(existingObj);
             cache.put(suffix,urlRequest.getUrl());
+            LOGGER.info("[updateLongUrl]: updated long url for suffix : {} is : {}" , suffix, urlRequest.getUrl());
             return shortUrlString(suffix,userId);
         }else{
+            LOGGER.info("[updateLongUrl]: updated long url for suffix : {} is : {}" , suffix, urlRequest.getUrl());
             throw new UrlNotFoundException(StringConstants.Error.URL_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }
     }
