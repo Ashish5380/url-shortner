@@ -12,5 +12,7 @@ public interface StringConstants {
         String USER_ID_NOT_EXIST = "User id provided does not exist";
 
         String USER_CREATION_ERROR = "Unable to create user in the system";
+
+        String INVALID_LONG_URL = "Provided long url is invalid";
     }
 }

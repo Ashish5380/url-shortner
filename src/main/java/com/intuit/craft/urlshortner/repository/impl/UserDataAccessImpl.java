@@ -53,7 +53,6 @@ public class UserDataAccessImpl implements UserDataAccess {
 
             Update update = new Update()
                     .set("name", entity.getName())
-                    .set("customPrefix", entity.getCustomPrefix())
                     .set("tps", entity.getTps())
                     .set("email", entity.getEmail());
 

@@ -13,5 +13,4 @@ public class CreateUserRequest {
     String name;
     String email;
     Integer tps;
-    String customPrefix;
 }

@@ -1,5 +1,6 @@
 package com.intuit.craft.urlshortner.models.bo;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ShortenUrlBO {
     String shortUrl;
     String longUrl;

@@ -36,16 +36,11 @@ public class UserServiceImpl implements UserService {
                         .name(createUserRequest.getName())
                         .tps(createUserRequest.getTps())
                         .email(createUserRequest.getEmail())
-                        .customPrefix(createUserRequest.getCustomPrefix())
                         .build());
         if(user.isPresent()){
             String userId = user.get().getId().toHexString();
             LOGGER.info("[createUser] : created user with email {} with user-id : {}",createUserRequest.getEmail(),
                     userId);
-            cache.put(userId, UserCacheBO.builder()
-                            .customPrefix(user.get().getCustomPrefix())
-                            .tps(user.get().getTps())
-                            .build());
             return userId;
         }else{
             LOGGER.info("[createUser]: error : {} for user with email : {}",StringConstants.Error.USER_CREATION_ERROR,
@@ -63,7 +58,6 @@ public class UserServiceImpl implements UserService {
             if (user.isPresent()) {
                 userCacheBO = Optional.ofNullable(UserCacheBO.builder()
                                 .tps(user.get().getTps())
-                                .customPrefix(user.get().getCustomPrefix())
                         .build());
             } else {
                 LOGGER.error("[getUserCachedObject]: error getting user cache object : {} for user : {}",
@@ -83,12 +77,10 @@ public class UserServiceImpl implements UserService {
                 .name(updateUserRequest.getName())
                 .tps(updateUserRequest.getTps())
                 .email(updateUserRequest.getEmail())
-                .customPrefix(updateUserRequest.getCustomPrefix())
                 .build());
         UserCacheBO userCacheBO = getUserCachedObject(updateUserRequest.getId());
         userCacheBO.setTps(updateUserRequest.getTps());
-        userCacheBO.setCustomPrefix(updateUserRequest.getCustomPrefix());
-        cache.put(updateUserRequest.getId(),userCacheBO);
+        cache.delete(updateUserRequest.getId());
         return updateUserRequest.getId();
     }
 

@@ -12,6 +12,5 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
 public class UserCacheBO {
-    String customPrefix;
     Integer tps;
 }

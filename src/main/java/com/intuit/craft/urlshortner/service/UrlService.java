@@ -9,5 +9,5 @@ public interface UrlService {
 
     String convertToLongUrl(String path);
 
-    String updateLongUrl(LongUrlUpdateRequest urlRequest, String userId);
+    String updateLongUrl(LongUrlUpdateRequest urlRequest);
 }

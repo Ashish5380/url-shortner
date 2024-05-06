@@ -4,6 +4,7 @@ import com.intuit.craft.urlshortner.cache.Cache;
 import com.intuit.craft.urlshortner.cache.DistributedCache;
 import com.intuit.craft.urlshortner.service.RateLimiter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.support.atomic.RedisAtomicInteger;
 import org.springframework.data.redis.support.atomic.RedisAtomicLong;
 import org.springframework.stereotype.Service;
 
@@ -20,28 +21,13 @@ public class RateLimiterServiceImpl implements RateLimiter {
     private final DistributedCache cache;
 
     @Override
-    public boolean isTooManyRequests(final String urlCode) {
-        RedisAtomicLong bucket = getOrInitializeBucket(urlCode, DEFAULT_TPS);
-
-        long newCount = bucket.decrementAndGet();
-        if (newCount < 0) {
-            bucket.incrementAndGet();
-            return true;
+    public boolean isTooManyRequests(final String urlCode, final long tps) {
+        RedisAtomicInteger bucket = cache.atomicInteger(urlCode);
+        int current = bucket.incrementAndGet();
+        if(current <= 1) {
+            bucket.expire(1L, TimeUnit.SECONDS);
         }
-        return false;
-    }
 
-    @Override
-    public void updateLimit(final String urlCode, final long limit) {
-        getOrInitializeBucket(urlCode, limit);
-    }
-
-    private RedisAtomicLong getOrInitializeBucket(final String code, final long tps) {
-        RedisAtomicLong currentTps = cache.atomicLong(code, 1L, TimeUnit.SECONDS);
-        if (currentTps.get() == 0) {
-            // Initialize bucket with tokens equal to the rate limit
-            currentTps.set(tps);
-        }
-        return currentTps;
+        return current > tps;
     }
 }

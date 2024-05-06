@@ -15,5 +15,4 @@ public class UserBO {
     String name;
     String email;
     Integer tps;
-    String customPrefix;
 }

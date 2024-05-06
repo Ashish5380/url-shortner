@@ -14,5 +14,4 @@ public class UpdateUserRequest {
     String name;
     String email;
     Integer tps;
-    String customPrefix;
 }

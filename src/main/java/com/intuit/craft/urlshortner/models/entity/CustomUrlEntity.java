@@ -7,14 +7,17 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "url_audit")
-public class UrlAuditEntity extends BaseEntity{
-    String referenceId;
-
-
+public class CustomUrlEntity extends BaseEntity{
+    String userId;
+    String actualUrl;
+    String shortUrl;
+    LocalDateTime expiry;
 }
