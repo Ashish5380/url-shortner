@@ -175,7 +175,7 @@ class UrlServiceImplTest {
         String actualUpdateLongUrlResult = urlServiceImpl
                 .updateLongUrl(new LongUrlUpdateRequest("https://ashish.com/test", 1, "https://ashish.com/test"));
         verify(cache).put(eq("test"), eq("https://ashish.com/test"));
-        verify(urlMongoRepository).findDistinctByBaseValue(eq(955064792));
+        verify(urlMongoRepository).findDistinctByBaseValue(eq(6967093));
         verify(urlMongoRepository).save(isA(UrlEntity.class));
         assertEquals("http://localhost:9015/url/r/test", actualUpdateLongUrlResult);
     }
@@ -202,7 +202,7 @@ class UrlServiceImplTest {
                 distributedCache, new CustomUrlDataAccessImpl(mock(CustomUrlMongoRepository.class)));
         assertThrows(UrlNotFoundException.class, () -> urlServiceImpl
                 .updateLongUrl(new LongUrlUpdateRequest("https://ashish.com/test", 1, "https://ashish.com/test")));
-        verify(urlMongoRepository).findDistinctByBaseValue(eq(955064792));
+        verify(urlMongoRepository).findDistinctByBaseValue(eq(6967093));
     }
 
     @Test
