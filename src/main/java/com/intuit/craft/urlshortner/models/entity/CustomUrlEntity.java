@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "url_audit")
+@Document(collection = "custom_url")
 public class CustomUrlEntity extends BaseEntity{
     String userId;
     String actualUrl;
