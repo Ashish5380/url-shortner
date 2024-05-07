@@ -113,10 +113,23 @@ public class UrlServiceImpl implements UrlService {
         }
     }
 
+    /**
+     * Helper method to form the full short URL string from a suffix.
+     *
+     * @param suffix the short URL suffix.
+     * @return the full short URL.
+     */
     private String shortUrlString(String suffix){
         return URL_PREFIX + suffix;
     }
 
+    /**
+     * Retrieves a resolved URL object from cache or database based on the short URL path provided.
+     *
+     * @param path the short URL path.
+     * @return ResolveUrlBo containing URL data.
+     * @throws UrlNotFoundException if the URL cannot be found.
+     */
     private ResolveUrlBo getUrlFromPath(final String path) {
         Optional<ResolveUrlBo> cachedUrlBo = cache.get(path, ResolveUrlBo.class);
         if(cachedUrlBo.isPresent()){
@@ -131,6 +144,12 @@ public class UrlServiceImpl implements UrlService {
         return checkGeneralUrlDao(basePath, path);
     }
 
+    /**
+     * Attempts to fetch URL data from a custom URL data source.
+     *
+     * @param path the short URL path.
+     * @return an optional ResolveUrlBo if found.
+     */
     private Optional<ResolveUrlBo> checkCustomUrlDataAccess(String path) {
         return customUrlDataAccess.findByShortSuffix(path).map(entity -> {
             UserCacheBO user = userService.getUserCachedObject(entity.getUserId());
@@ -144,6 +163,14 @@ public class UrlServiceImpl implements UrlService {
         });
     }
 
+    /**
+     * Fetches URL data from the general URL data source if not available in custom data access.
+     *
+     * @param basePath the decoded base path.
+     * @param path the short URL path.
+     * @return ResolveUrlBo containing URL data.
+     * @throws UrlNotFoundException if the URL data cannot be retrieved.
+     */
     private ResolveUrlBo checkGeneralUrlDao(Integer basePath, String path) throws UrlNotFoundException {
         return urlDao.findByBasePath(basePath)
                 .map(entity -> {
@@ -160,6 +187,13 @@ public class UrlServiceImpl implements UrlService {
     }
 
 
+    /**
+     * Saves a custom short URL to the database and returns the full short URL if successful.
+     *
+     * @param request the request containing the long URL and custom short URL.
+     * @return the full short URL.
+     * @throws UrlCreationException if there is an issue saving the URL.
+     */
     private String saveCustomUrl(ShortenUrlRequest request){
         if(UrlUtil.isUrlValid(request.getUrl()) && UrlUtil.isValidCustomSuffix(request.getShortUrl())){
             Optional<CustomUrlEntity> entity = customUrlDataAccess.saveToDB(ShortenUrlBO.builder()
