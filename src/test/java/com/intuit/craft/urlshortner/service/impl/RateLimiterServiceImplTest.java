@@ -27,6 +27,6 @@ class RateLimiterServiceImplTest {
     @Disabled("TODO: Complete this test")
     void testIsTooManyRequests() {
         when(distributedCache.atomicInteger(Mockito.<String>any())).thenReturn(null);
-        rateLimiterServiceImpl.isTooManyRequests("https://example.org/example", 1L);
+        rateLimiterServiceImpl.isTooManyRequests("https://ashish.com/test", 1L);
     }
 }

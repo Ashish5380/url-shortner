@@ -16,12 +16,12 @@ class ConversionImplTest {
 
     @Test
     void testEncode() {
-        assertEquals("0000003", conversionImpl.encode("https://example.org/example", 3));
+        assertEquals("0000003", conversionImpl.encode("https://ashish.com/test", 3));
     }
 
     @Test
     void testDecode() {
-        assertEquals(125187160, conversionImpl.decode("https://example.org/example").intValue());
+        assertEquals(1396693349, conversionImpl.decode("https://ashish.com/test").intValue());
         assertEquals(655738317, conversionImpl.decode("Input").intValue());
         assertEquals(250, conversionImpl.decode("42").intValue());
     }
@@ -42,7 +42,7 @@ class ConversionImplTest {
 
     @Test
     void testBase62ToBase10() {
-        assertEquals(125187160, conversionImpl.base62ToBase10("https://example.org/example").intValue());
+        assertEquals(1396693349, conversionImpl.base62ToBase10("https://ashish.com/test").intValue());
         assertEquals(250, conversionImpl.base62ToBase10("42").intValue());
     }
 }

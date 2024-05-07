@@ -8,13 +8,13 @@ import org.junit.jupiter.api.Test;
 class UrlUtilTest {
     @Test
     void testIsUrlValid() {
-        assertTrue(UrlUtil.isUrlValid("https://example.org/example"));
+        assertTrue(UrlUtil.isUrlValid("https://ashish.com/test"));
         assertFalse(UrlUtil.isUrlValid("^[a-zA-Z0-9$\\-_.+!*'(),]*$"));
     }
 
     @Test
     void testIsValidCustomSuffix() {
-        assertFalse(UrlUtil.isValidCustomSuffix("https://example.org/example"));
+        assertFalse(UrlUtil.isValidCustomSuffix("https://ashish.com/test"));
         assertTrue(UrlUtil.isValidCustomSuffix("foo"));
         assertTrue(UrlUtil.isValidCustomSuffix("U"));
         assertTrue(UrlUtil.isValidCustomSuffix("Suffix"));

@@ -53,9 +53,9 @@ class UserServiceImplTest {
     void testCreateUser() {
         UserEntity userEntity = new UserEntity();
         userEntity.setCreatedAt(LocalDate.of(1970, 1, 1).atStartOfDay());
-        userEntity.setEmail("https://example.org/example");
+        userEntity.setEmail("https://ashish.com/test");
         userEntity.setId(ObjectId.get());
-        userEntity.setName("https://example.org/example");
+        userEntity.setName("https://ashish.com/test");
         userEntity.setTps(1);
         userEntity.setUpdatedAt(LocalDate.of(1970, 1, 1).atStartOfDay());
         Optional<UserEntity> ofResult = Optional.of(userEntity);
@@ -75,9 +75,9 @@ class UserServiceImplTest {
         doNothing().when(userEntity).setName(Mockito.<String>any());
         doNothing().when(userEntity).setTps(Mockito.<Integer>any());
         userEntity.setCreatedAt(LocalDate.of(1970, 1, 1).atStartOfDay());
-        userEntity.setEmail("https://example.org/example");
+        userEntity.setEmail("https://ashish.com/test");
         userEntity.setId(ObjectId.get());
-        userEntity.setName("https://example.org/example");
+        userEntity.setName("https://ashish.com/test");
         userEntity.setTps(1);
         userEntity.setUpdatedAt(LocalDate.of(1970, 1, 1).atStartOfDay());
         Optional<UserEntity> ofResult = Optional.of(userEntity);
@@ -87,8 +87,8 @@ class UserServiceImplTest {
         verify(userEntity).setCreatedAt(isA(LocalDateTime.class));
         verify(userEntity).setId(isA(ObjectId.class));
         verify(userEntity).setUpdatedAt(isA(LocalDateTime.class));
-        verify(userEntity).setEmail(eq("https://example.org/example"));
-        verify(userEntity).setName(eq("https://example.org/example"));
+        verify(userEntity).setEmail(eq("https://ashish.com/test"));
+        verify(userEntity).setName(eq("https://ashish.com/test"));
         verify(userEntity).setTps(eq(1));
         verify(userDataAccess).addToDB(isA(UserBO.class));
     }
@@ -108,22 +108,22 @@ class UserServiceImplTest {
         UserCacheBO userCacheBO = new UserCacheBO();
         Optional<UserCacheBO> ofResult = Optional.of(userCacheBO);
         when(cache.get(Mockito.<String>any(), Mockito.<Class<UserCacheBO>>any())).thenReturn(ofResult);
-        UserCacheBO actualUserCachedObject = userServiceImpl.getUserCachedObject("https://example.org/example");
-        verify(cache).get(eq("https://example.org/example"), isA(Class.class));
-        verify(cache).put(eq("https://example.org/example"), isA(UserCacheBO.class));
+        UserCacheBO actualUserCachedObject = userServiceImpl.getUserCachedObject("https://ashish.com/test");
+        verify(cache).get(eq("https://ashish.com/test"), isA(Class.class));
+        verify(cache).put(eq("https://ashish.com/test"), isA(UserCacheBO.class));
         assertSame(userCacheBO, actualUserCachedObject);
     }
 
     @Test
     void testGetUserCachedObject2() {
-        doThrow(new UserCreationException("https://example.org/example", "https://example.org/example")).when(cache)
+        doThrow(new UserCreationException("https://ashish.com/test", "https://ashish.com/teste")).when(cache)
                 .put(Mockito.<String>any(), Mockito.<UserCacheBO>any());
         Optional<UserCacheBO> ofResult = Optional.of(new UserCacheBO());
         when(cache.get(Mockito.<String>any(), Mockito.<Class<UserCacheBO>>any())).thenReturn(ofResult);
 
-        assertThrows(UserCreationException.class, () -> userServiceImpl.getUserCachedObject("https://example.org/example"));
-        verify(cache).get(eq("https://example.org/example"), isA(Class.class));
-        verify(cache).put(eq("https://example.org/example"), isA(UserCacheBO.class));
+        assertThrows(UserCreationException.class, () -> userServiceImpl.getUserCachedObject("https://ashish.com/test"));
+        verify(cache).get(eq("https://ashish.com/test"), isA(Class.class));
+        verify(cache).put(eq("https://ashish.com/test"), isA(UserCacheBO.class));
     }
 
     @Test
@@ -135,17 +135,17 @@ class UserServiceImplTest {
 
         UserEntity userEntity = new UserEntity();
         userEntity.setCreatedAt(LocalDate.of(1970, 1, 1).atStartOfDay());
-        userEntity.setEmail("https://example.org/example");
+        userEntity.setEmail("https://ashish.com/test");
         userEntity.setId(ObjectId.get());
-        userEntity.setName("https://example.org/example");
+        userEntity.setName("https://ashish.com/test");
         userEntity.setTps(1);
         userEntity.setUpdatedAt(LocalDate.of(1970, 1, 1).atStartOfDay());
         Optional<UserEntity> ofResult = Optional.of(userEntity);
         when(userDataAccess.findUserById(Mockito.<String>any())).thenReturn(ofResult);
-        UserCacheBO actualUserCachedObject = userServiceImpl.getUserCachedObject("https://example.org/example");
-        verify(cache).get(eq("https://example.org/example"), isA(Class.class));
-        verify(cache).put(eq("https://example.org/example"), isA(UserCacheBO.class));
-        verify(userDataAccess).findUserById(eq("https://example.org/example"));
+        UserCacheBO actualUserCachedObject = userServiceImpl.getUserCachedObject("https://ashish.com/test");
+        verify(cache).get(eq("https://ashish.com/test"), isA(Class.class));
+        verify(cache).put(eq("https://ashish.com/test"), isA(UserCacheBO.class));
+        verify(userDataAccess).findUserById(eq("https://ashish.com/test"));
         assertEquals(1, actualUserCachedObject.getTps().intValue());
     }
 
@@ -154,11 +154,11 @@ class UserServiceImplTest {
         Optional<UserCacheBO> emptyResult = Optional.empty();
         when(cache.get(Mockito.<String>any(), Mockito.<Class<UserCacheBO>>any())).thenReturn(emptyResult);
         when(userDataAccess.findUserById(Mockito.<String>any()))
-                .thenThrow(new UserCreationException("https://example.org/example", "https://example.org/example"));
+                .thenThrow(new UserCreationException("https://ashish.com/test", "https://ashish.com/test"));
 
-        assertThrows(UserCreationException.class, () -> userServiceImpl.getUserCachedObject("https://example.org/example"));
-        verify(cache).get(eq("https://example.org/example"), isA(Class.class));
-        verify(userDataAccess).findUserById(eq("https://example.org/example"));
+        assertThrows(UserCreationException.class, () -> userServiceImpl.getUserCachedObject("https://ashish.com/test"));
+        verify(cache).get(eq("https://ashish.com/test"), isA(Class.class));
+        verify(userDataAccess).findUserById(eq("https://ashish.com/test"));
     }
 
     @Test
@@ -176,24 +176,24 @@ class UserServiceImplTest {
         doNothing().when(userEntity).setName(Mockito.<String>any());
         doNothing().when(userEntity).setTps(Mockito.<Integer>any());
         userEntity.setCreatedAt(LocalDate.of(1970, 1, 1).atStartOfDay());
-        userEntity.setEmail("https://example.org/example");
+        userEntity.setEmail("https://ashish.com/test");
         userEntity.setId(ObjectId.get());
-        userEntity.setName("https://example.org/example");
+        userEntity.setName("https://ashish.com/test");
         userEntity.setTps(1);
         userEntity.setUpdatedAt(LocalDate.of(1970, 1, 1).atStartOfDay());
         Optional<UserEntity> ofResult = Optional.of(userEntity);
         when(userDataAccess.findUserById(Mockito.<String>any())).thenReturn(ofResult);
-        UserCacheBO actualUserCachedObject = userServiceImpl.getUserCachedObject("https://example.org/example");
-        verify(cache).get(eq("https://example.org/example"), isA(Class.class));
-        verify(cache).put(eq("https://example.org/example"), isA(UserCacheBO.class));
+        UserCacheBO actualUserCachedObject = userServiceImpl.getUserCachedObject("https://ashish.com/test");
+        verify(cache).get(eq("https://ashish.com/test"), isA(Class.class));
+        verify(cache).put(eq("https://ashish.com/test"), isA(UserCacheBO.class));
         verify(userEntity).setCreatedAt(isA(LocalDateTime.class));
         verify(userEntity).setId(isA(ObjectId.class));
         verify(userEntity).setUpdatedAt(isA(LocalDateTime.class));
         verify(userEntity).getTps();
-        verify(userEntity).setEmail(eq("https://example.org/example"));
-        verify(userEntity).setName(eq("https://example.org/example"));
+        verify(userEntity).setEmail(eq("https://ashish.com/test"));
+        verify(userEntity).setName(eq("https://ashish.com/test"));
         verify(userEntity).setTps(eq(1));
-        verify(userDataAccess).findUserById(eq("https://example.org/example"));
+        verify(userDataAccess).findUserById(eq("https://ashish.com/test"));
         assertEquals(1, actualUserCachedObject.getTps().intValue());
     }
 
@@ -203,9 +203,9 @@ class UserServiceImplTest {
         when(cache.get(Mockito.<String>any(), Mockito.<Class<UserCacheBO>>any())).thenReturn(emptyResult);
         Optional<UserEntity> emptyResult2 = Optional.empty();
         when(userDataAccess.findUserById(Mockito.<String>any())).thenReturn(emptyResult2);
-        assertThrows(UserNotFoundException.class, () -> userServiceImpl.getUserCachedObject("https://example.org/example"));
-        verify(cache).get(eq("https://example.org/example"), isA(Class.class));
-        verify(userDataAccess).findUserById(eq("https://example.org/example"));
+        assertThrows(UserNotFoundException.class, () -> userServiceImpl.getUserCachedObject("https://ashish.com/test"));
+        verify(cache).get(eq("https://ashish.com/test"), isA(Class.class));
+        verify(userDataAccess).findUserById(eq("https://ashish.com/test"));
     }
 
     @Test

@@ -88,13 +88,13 @@ class UrlServiceImplTest {
         when(cache.get(Mockito.<String>any(), Mockito.<Class<ResolveUrlBo>>any())).thenReturn(emptyResult);
 
         CustomUrlEntity customUrlEntity = new CustomUrlEntity();
-        customUrlEntity.setActualUrl("https://example.org/example");
+        customUrlEntity.setActualUrl("https://ashish.com/test");
         customUrlEntity.setCreatedAt(LocalDate.of(1970, 1, 1).atStartOfDay());
         customUrlEntity.setExpiry(LocalDate.of(1970, 1, 1).atStartOfDay());
         customUrlEntity.setId(ObjectId.get());
-        customUrlEntity.setShortUrl("https://example.org/example");
+        customUrlEntity.setShortUrl("https://ashish.com/test");
         customUrlEntity.setUpdatedAt(LocalDate.of(1970, 1, 1).atStartOfDay());
-        customUrlEntity.setUserId("https://example.org/example");
+        customUrlEntity.setUserId("https://ashish.com/test");
         Optional<CustomUrlEntity> ofResult = Optional.of(customUrlEntity);
         CustomUrlMongoRepository urlMongoRepository = mock(CustomUrlMongoRepository.class);
         when(urlMongoRepository.findDistinctByShortUrl(Mockito.<String>any())).thenReturn(ofResult);
@@ -112,9 +112,9 @@ class UrlServiceImplTest {
         assertThrows(CacheOperationException.class,
                 () -> (new UrlServiceImpl(cache, urlDao, conversion, userService, rateLimiter,
                         new RedisCacheImpl(redisTemplate2, new ObjectMapper()), customUrlDataAccess))
-                        .convertToLongUrl("https://example.org/example"));
-        verify(cache).get(eq("https://example.org/example"), isA(Class.class));
-        verify(urlMongoRepository).findDistinctByShortUrl(eq("https://example.org/example"));
+                        .convertToLongUrl("https://ashish.com/test"));
+        verify(cache).get(eq("https://ashish.com/test"), isA(Class.class));
+        verify(urlMongoRepository).findDistinctByShortUrl(eq("https://ashish.com/test"));
     }
 
     @Test
@@ -122,12 +122,12 @@ class UrlServiceImplTest {
     void testConvertToLongUrl2() {
         ResolveUrlBo.ResolveUrlBoBuilder builderResult = ResolveUrlBo.builder();
         ResolveUrlBo buildResult = builderResult.expiry(LocalDate.of(1970, 1, 1).atStartOfDay())
-                .longUrl("https://example.org/example")
+                .longUrl("https://ashish.com/test")
                 .tps(1L)
                 .build();
         Optional<ResolveUrlBo> ofResult = Optional.of(buildResult);
         when(cache.get(Mockito.<String>any(), Mockito.<Class<ResolveUrlBo>>any())).thenReturn(ofResult);
-        urlServiceImpl.convertToLongUrl("https://example.org/example");
+        urlServiceImpl.convertToLongUrl("https://ashish.com/test");
     }
 
     @Test
@@ -136,25 +136,25 @@ class UrlServiceImplTest {
         doNothing().when(cache).put(Mockito.<String>any(), Mockito.<String>any());
 
         UrlEntity urlEntity = new UrlEntity();
-        urlEntity.setActualUrl("https://example.org/example");
+        urlEntity.setActualUrl("https://ashish.com/test");
         urlEntity.setBaseValue(42);
         urlEntity.setCreatedAt(LocalDate.of(1970, 1, 1).atStartOfDay());
         urlEntity.setExpiry(LocalDate.of(1970, 1, 1).atStartOfDay());
         urlEntity.setId(ObjectId.get());
-        urlEntity.setShortUrl("https://example.org/example");
+        urlEntity.setShortUrl("https://ashish.com/test");
         urlEntity.setUpdatedAt(LocalDate.of(1970, 1, 1).atStartOfDay());
-        urlEntity.setUserId("https://example.org/example");
+        urlEntity.setUserId("https://ashish.com/test");
         Optional<UrlEntity> ofResult = Optional.of(urlEntity);
 
         UrlEntity urlEntity2 = new UrlEntity();
-        urlEntity2.setActualUrl("https://example.org/example");
+        urlEntity2.setActualUrl("https://ashish.com/test");
         urlEntity2.setBaseValue(42);
         urlEntity2.setCreatedAt(LocalDate.of(1970, 1, 1).atStartOfDay());
         urlEntity2.setExpiry(LocalDate.of(1970, 1, 1).atStartOfDay());
         urlEntity2.setId(ObjectId.get());
-        urlEntity2.setShortUrl("https://example.org/example");
+        urlEntity2.setShortUrl("https://ashish.com/test");
         urlEntity2.setUpdatedAt(LocalDate.of(1970, 1, 1).atStartOfDay());
-        urlEntity2.setUserId("https://example.org/example");
+        urlEntity2.setUserId("https://ashish.com/test");
         UrlMongoRepository urlMongoRepository = mock(UrlMongoRepository.class);
         when(urlMongoRepository.save(Mockito.<UrlEntity>any())).thenReturn(urlEntity2);
         when(urlMongoRepository.findDistinctByBaseValue(Mockito.<Integer>any())).thenReturn(ofResult);
@@ -173,11 +173,11 @@ class UrlServiceImplTest {
         UrlServiceImpl urlServiceImpl = new UrlServiceImpl(cache, urlDao, conversion, userService, rateLimiter,
                 distributedCache, new CustomUrlDataAccessImpl(mock(CustomUrlMongoRepository.class)));
         String actualUpdateLongUrlResult = urlServiceImpl
-                .updateLongUrl(new LongUrlUpdateRequest("https://example.org/example", 1, "https://example.org/example"));
-        verify(cache).put(eq("example"), eq("https://example.org/example"));
+                .updateLongUrl(new LongUrlUpdateRequest("https://ashish.com/test", 1, "https://ashish.com/test"));
+        verify(cache).put(eq("test"), eq("https://ashish.com/test"));
         verify(urlMongoRepository).findDistinctByBaseValue(eq(955064792));
         verify(urlMongoRepository).save(isA(UrlEntity.class));
-        assertEquals("http://localhost:9015/url/r/example", actualUpdateLongUrlResult);
+        assertEquals("http://localhost:9015/url/r/test", actualUpdateLongUrlResult);
     }
 
     @Test
@@ -201,7 +201,7 @@ class UrlServiceImplTest {
         UrlServiceImpl urlServiceImpl = new UrlServiceImpl(cache, urlDao, conversion, userService, rateLimiter,
                 distributedCache, new CustomUrlDataAccessImpl(mock(CustomUrlMongoRepository.class)));
         assertThrows(UrlNotFoundException.class, () -> urlServiceImpl
-                .updateLongUrl(new LongUrlUpdateRequest("https://example.org/example", 1, "https://example.org/example")));
+                .updateLongUrl(new LongUrlUpdateRequest("https://ashish.com/test", 1, "https://ashish.com/test")));
         verify(urlMongoRepository).findDistinctByBaseValue(eq(955064792));
     }
 

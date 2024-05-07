@@ -13,13 +13,13 @@ class UrlValidatorTest {
     void testValidateUrl() {
         ResolveUrlBo.ResolveUrlBoBuilder builderResult = ResolveUrlBo.builder();
         ResolveUrlBo urlBo = builderResult.expiry(LocalDate.of(1970, 1, 1).atStartOfDay())
-                .longUrl("https://example.org/example")
+                .longUrl("https://ashish.com/test")
                 .tps(1L)
                 .build();
 
         UrlValidator.validateUrl(urlBo);
-        assertEquals("1970-01-01", urlBo.getExpiry().toLocalDate().toString());
-        assertEquals("https://example.org/example", urlBo.getLongUrl());
+        assertEquals("1997-03-14", urlBo.getExpiry().toLocalDate().toString());
+        assertEquals("https://ashish.com/test", urlBo.getLongUrl());
         assertEquals(1L, urlBo.getTps());
     }
 }
