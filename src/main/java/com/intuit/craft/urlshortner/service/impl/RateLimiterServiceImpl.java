@@ -22,12 +22,17 @@ public class RateLimiterServiceImpl implements RateLimiter {
 
     @Override
     public boolean isTooManyRequests(final String urlCode, final long tps) {
+        // Get or create an atomic integer in Redis for the given URL code.
         RedisAtomicInteger bucket = cache.atomicInteger(urlCode);
+
+        // Increment the request count atomically.
         int current = bucket.incrementAndGet();
+
+        // If this is the first request in the current second, set the Redis key to expire after 1 second.
         if(current <= 1) {
             bucket.expire(1L, TimeUnit.SECONDS);
         }
-
+        // Check if the current number of requests has exceeded the tps limit.
         return current > tps;
     }
 }
