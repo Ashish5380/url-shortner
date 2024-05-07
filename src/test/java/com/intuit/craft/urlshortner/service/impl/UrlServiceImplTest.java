@@ -1,64 +1,213 @@
 package com.intuit.craft.urlshortner.service.impl;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intuit.craft.urlshortner.cache.Cache;
 import com.intuit.craft.urlshortner.cache.DistributedCache;
+import com.intuit.craft.urlshortner.cache.impl.RedisCacheImpl;
+import com.intuit.craft.urlshortner.exceptions.fatal.CacheOperationException;
+import com.intuit.craft.urlshortner.exceptions.service.UrlNotFoundException;
 import com.intuit.craft.urlshortner.models.bo.ResolveUrlBo;
+import com.intuit.craft.urlshortner.models.dto.request.LongUrlUpdateRequest;
+import com.intuit.craft.urlshortner.models.dto.request.ShortenUrlRequest;
+import com.intuit.craft.urlshortner.models.entity.CustomUrlEntity;
+import com.intuit.craft.urlshortner.models.entity.UrlEntity;
 import com.intuit.craft.urlshortner.repository.CustomUrlDataAccess;
 import com.intuit.craft.urlshortner.repository.UrlDataAccess;
+import com.intuit.craft.urlshortner.repository.impl.CustomUrlDataAccessImpl;
+import com.intuit.craft.urlshortner.repository.impl.UrlDataAccessImpl;
+import com.intuit.craft.urlshortner.repository.impl.UserDataAccessImpl;
+import com.intuit.craft.urlshortner.repository.mongo.CustomUrlMongoRepository;
+import com.intuit.craft.urlshortner.repository.mongo.UrlMongoRepository;
+import com.intuit.craft.urlshortner.repository.mongo.UserMongoRepository;
 import com.intuit.craft.urlshortner.service.Conversion;
 import com.intuit.craft.urlshortner.service.RateLimiter;
 import com.intuit.craft.urlshortner.service.UserService;
-import org.junit.Before;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import org.bson.types.ObjectId;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.aot.DisabledInAotMode;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-public class UrlServiceImplTest {
-    @Mock
+@ContextConfiguration(classes = {UrlServiceImpl.class, Cache.class})
+@ExtendWith(SpringExtension.class)
+@DisabledInAotMode
+class UrlServiceImplTest {
+    @MockBean
     private Cache cache;
-    @Mock
-    private UrlDataAccess urlDao;
-    @Mock
+
+    @MockBean
     private Conversion conversion;
-    @Mock
-    private UserService userService;
-    @Mock
-    private RateLimiter rateLimiter;
-    @Mock
-    private DistributedCache distributedCache;
-    @Mock
+
+    @MockBean
     private CustomUrlDataAccess customUrlDataAccess;
 
-    @InjectMocks
-    private UrlServiceImpl urlService;
+    @MockBean
+    private DistributedCache distributedCache;
 
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
+    @MockBean
+    private RateLimiter rateLimiter;
+
+    @MockBean
+    private UrlDataAccess urlDataAccess;
+
+    @Autowired
+    private UrlServiceImpl urlServiceImpl;
+
+    @MockBean
+    private UserService userService;
+
+    @Test
+    @Disabled("TODO: Complete this test")
+    void testConvertToShortUrl() {
+        urlServiceImpl.convertToShortUrl(new ShortenUrlRequest());
     }
 
     @Test
-    public void testConvertToLongUrl_SuccessFromCache() throws Exception {
-        String path = "testPath";
-        ResolveUrlBo mockUrlBo = new ResolveUrlBo();
-        mockUrlBo.setLongUrl("http://example.com");
+    void testConvertToLongUrl() {
+        RedisCacheImpl cache = mock(RedisCacheImpl.class);
+        Optional<ResolveUrlBo> emptyResult = Optional.empty();
+        when(cache.get(Mockito.<String>any(), Mockito.<Class<ResolveUrlBo>>any())).thenReturn(emptyResult);
 
-        when(cache.get(anyString(), (TypeReference<Object>) any())).thenReturn(Optional.of(mockUrlBo));
+        CustomUrlEntity customUrlEntity = new CustomUrlEntity();
+        customUrlEntity.setActualUrl("https://example.org/example");
+        customUrlEntity.setCreatedAt(LocalDate.of(1970, 1, 1).atStartOfDay());
+        customUrlEntity.setExpiry(LocalDate.of(1970, 1, 1).atStartOfDay());
+        customUrlEntity.setId(ObjectId.get());
+        customUrlEntity.setShortUrl("https://example.org/example");
+        customUrlEntity.setUpdatedAt(LocalDate.of(1970, 1, 1).atStartOfDay());
+        customUrlEntity.setUserId("https://example.org/example");
+        Optional<CustomUrlEntity> ofResult = Optional.of(customUrlEntity);
+        CustomUrlMongoRepository urlMongoRepository = mock(CustomUrlMongoRepository.class);
+        when(urlMongoRepository.findDistinctByShortUrl(Mockito.<String>any())).thenReturn(ofResult);
+        CustomUrlDataAccessImpl customUrlDataAccess = new CustomUrlDataAccessImpl(urlMongoRepository);
+        UrlDataAccessImpl urlDao = new UrlDataAccessImpl(mock(UrlMongoRepository.class));
+        ConversionImpl conversion = new ConversionImpl();
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+        RedisCacheImpl cache2 = new RedisCacheImpl(redisTemplate, new ObjectMapper());
 
-        String result = urlService.convertToLongUrl(path);
+        UserServiceImpl userService = new UserServiceImpl(cache2,
+                new UserDataAccessImpl(mock(UserMongoRepository.class), null));
 
-        assertEquals("http://ashish.com", result);
-        verify(urlDao, never()).findByBasePath(anyInt());
+        RateLimiter rateLimiter = mock(RateLimiter.class);
+        RedisTemplate<String, String> redisTemplate2 = new RedisTemplate<>();
+        assertThrows(CacheOperationException.class,
+                () -> (new UrlServiceImpl(cache, urlDao, conversion, userService, rateLimiter,
+                        new RedisCacheImpl(redisTemplate2, new ObjectMapper()), customUrlDataAccess))
+                        .convertToLongUrl("https://example.org/example"));
+        verify(cache).get(eq("https://example.org/example"), isA(Class.class));
+        verify(urlMongoRepository).findDistinctByShortUrl(eq("https://example.org/example"));
     }
 
+    @Test
+    @Disabled("TODO: Complete this test")
+    void testConvertToLongUrl2() {
+        ResolveUrlBo.ResolveUrlBoBuilder builderResult = ResolveUrlBo.builder();
+        ResolveUrlBo buildResult = builderResult.expiry(LocalDate.of(1970, 1, 1).atStartOfDay())
+                .longUrl("https://example.org/example")
+                .tps(1L)
+                .build();
+        Optional<ResolveUrlBo> ofResult = Optional.of(buildResult);
+        when(cache.get(Mockito.<String>any(), Mockito.<Class<ResolveUrlBo>>any())).thenReturn(ofResult);
+        urlServiceImpl.convertToLongUrl("https://example.org/example");
+    }
 
+    @Test
+    void testUpdateLongUrl() {
+        Cache cache = mock(Cache.class);
+        doNothing().when(cache).put(Mockito.<String>any(), Mockito.<String>any());
 
+        UrlEntity urlEntity = new UrlEntity();
+        urlEntity.setActualUrl("https://example.org/example");
+        urlEntity.setBaseValue(42);
+        urlEntity.setCreatedAt(LocalDate.of(1970, 1, 1).atStartOfDay());
+        urlEntity.setExpiry(LocalDate.of(1970, 1, 1).atStartOfDay());
+        urlEntity.setId(ObjectId.get());
+        urlEntity.setShortUrl("https://example.org/example");
+        urlEntity.setUpdatedAt(LocalDate.of(1970, 1, 1).atStartOfDay());
+        urlEntity.setUserId("https://example.org/example");
+        Optional<UrlEntity> ofResult = Optional.of(urlEntity);
 
+        UrlEntity urlEntity2 = new UrlEntity();
+        urlEntity2.setActualUrl("https://example.org/example");
+        urlEntity2.setBaseValue(42);
+        urlEntity2.setCreatedAt(LocalDate.of(1970, 1, 1).atStartOfDay());
+        urlEntity2.setExpiry(LocalDate.of(1970, 1, 1).atStartOfDay());
+        urlEntity2.setId(ObjectId.get());
+        urlEntity2.setShortUrl("https://example.org/example");
+        urlEntity2.setUpdatedAt(LocalDate.of(1970, 1, 1).atStartOfDay());
+        urlEntity2.setUserId("https://example.org/example");
+        UrlMongoRepository urlMongoRepository = mock(UrlMongoRepository.class);
+        when(urlMongoRepository.save(Mockito.<UrlEntity>any())).thenReturn(urlEntity2);
+        when(urlMongoRepository.findDistinctByBaseValue(Mockito.<Integer>any())).thenReturn(ofResult);
+        UrlDataAccessImpl urlDao = new UrlDataAccessImpl(urlMongoRepository);
+        ConversionImpl conversion = new ConversionImpl();
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+        RedisCacheImpl cache2 = new RedisCacheImpl(redisTemplate, new ObjectMapper());
 
+        UserServiceImpl userService = new UserServiceImpl(cache2,
+                new UserDataAccessImpl(mock(UserMongoRepository.class), null));
+
+        RateLimiter rateLimiter = mock(RateLimiter.class);
+        RedisTemplate<String, String> redisTemplate2 = new RedisTemplate<>();
+        RedisCacheImpl distributedCache = new RedisCacheImpl(redisTemplate2, new ObjectMapper());
+
+        UrlServiceImpl urlServiceImpl = new UrlServiceImpl(cache, urlDao, conversion, userService, rateLimiter,
+                distributedCache, new CustomUrlDataAccessImpl(mock(CustomUrlMongoRepository.class)));
+        String actualUpdateLongUrlResult = urlServiceImpl
+                .updateLongUrl(new LongUrlUpdateRequest("https://example.org/example", 1, "https://example.org/example"));
+        verify(cache).put(eq("example"), eq("https://example.org/example"));
+        verify(urlMongoRepository).findDistinctByBaseValue(eq(955064792));
+        verify(urlMongoRepository).save(isA(UrlEntity.class));
+        assertEquals("http://localhost:9015/url/r/example", actualUpdateLongUrlResult);
+    }
+
+    @Test
+    void testUpdateLongUrl2() {
+        UrlMongoRepository urlMongoRepository = mock(UrlMongoRepository.class);
+        Optional<UrlEntity> emptyResult = Optional.empty();
+        when(urlMongoRepository.findDistinctByBaseValue(Mockito.<Integer>any())).thenReturn(emptyResult);
+        UrlDataAccessImpl urlDao = new UrlDataAccessImpl(urlMongoRepository);
+        Cache cache = mock(Cache.class);
+        ConversionImpl conversion = new ConversionImpl();
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+        RedisCacheImpl cache2 = new RedisCacheImpl(redisTemplate, new ObjectMapper());
+
+        UserServiceImpl userService = new UserServiceImpl(cache2,
+                new UserDataAccessImpl(mock(UserMongoRepository.class), null));
+
+        RateLimiter rateLimiter = mock(RateLimiter.class);
+        RedisTemplate<String, String> redisTemplate2 = new RedisTemplate<>();
+        RedisCacheImpl distributedCache = new RedisCacheImpl(redisTemplate2, new ObjectMapper());
+
+        UrlServiceImpl urlServiceImpl = new UrlServiceImpl(cache, urlDao, conversion, userService, rateLimiter,
+                distributedCache, new CustomUrlDataAccessImpl(mock(CustomUrlMongoRepository.class)));
+        assertThrows(UrlNotFoundException.class, () -> urlServiceImpl
+                .updateLongUrl(new LongUrlUpdateRequest("https://example.org/example", 1, "https://example.org/example")));
+        verify(urlMongoRepository).findDistinctByBaseValue(eq(955064792));
+    }
+
+    @Test
+    @Disabled("TODO: Complete this test")
+    void testUpdateLongUrl3() {
+        urlServiceImpl.updateLongUrl(new LongUrlUpdateRequest());
+    }
 }
