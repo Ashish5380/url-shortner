@@ -82,3 +82,19 @@ Redirection to long url which is mapped to provided short url
     "email": "john.doe@example.com",
     "tps": 10
   }
+```
+
+### Update User
+
+- **Method**: POST
+- **Endpoint**: `/api/users/create`
+- **Description**: Creates a new user in the system. If successful, returns the unique identifier for the newly created user.
+- **Request Body**:
+
+```json
+  {
+    "id": "12345"
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "tps": 10
+  }
