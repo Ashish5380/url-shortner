@@ -28,12 +28,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import static com.intuit.craft.urlshortner.constants.ServiceConstants.COUNTER_KEY;
-import static com.intuit.craft.urlshortner.constants.ServiceConstants.URL_PREFIX;
+import static com.intuit.craft.urlshortner.constants.ServiceConstants.*;
 
 @Service
 @RequiredArgsConstructor
@@ -86,7 +86,7 @@ public class UrlServiceImpl implements UrlService {
         UrlValidator.validateUrl(longUrlBo);
 
         // Check if TPS exceeds
-        if (rateLimiter.isTooManyRequests("TPS-" + path, longUrlBo.getTps())) {
+        if (rateLimiter.isTooManyRequests(RATE_LIMIT_REDIS_KEY_PREFIX + path, longUrlBo.getTps())) {
             throw new TooManyRequestException("Throttling request", HttpStatus.TOO_MANY_REQUESTS);
         }
 
@@ -102,7 +102,9 @@ public class UrlServiceImpl implements UrlService {
         Optional<UrlEntity> urlEntity = urlDao.findByBasePath(baseValue);
         if(urlEntity.isPresent()){
             UrlEntity existingObj = urlEntity.get();
-            existingObj.setActualUrl(urlRequest.getUrl());
+            Optional.ofNullable(urlRequest.getUrl()).ifPresent(existingObj::setActualUrl);
+            Optional.ofNullable(urlRequest.getExpiry())
+                    .ifPresent(expiry -> existingObj.setExpiry(LocalDateTime.now().plusDays((long)urlRequest.getExpiry())));
             urlDao.upsertUrl(existingObj);
             cache.put(suffix,urlRequest.getUrl());
             LOGGER.info("[updateLongUrl]: updated long url for suffix : {} is : {}" , suffix, urlRequest.getUrl());

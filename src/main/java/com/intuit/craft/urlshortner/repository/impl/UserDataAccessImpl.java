@@ -51,10 +51,10 @@ public class UserDataAccessImpl implements UserDataAccess {
         try {
             Query query = new Query(Criteria.where("_id").is(entity.getId()));
 
-            Update update = new Update()
-                    .set("name", entity.getName())
-                    .set("tps", entity.getTps())
-                    .set("email", entity.getEmail());
+            Update update = new Update();
+            Optional.ofNullable(entity.getName()).ifPresent(name -> update.set("name", name));
+            Optional.ofNullable(entity.getTps()).ifPresent(tps -> update.set("tps", tps));
+            Optional.ofNullable(entity.getEmail()).ifPresent(email -> update.set("email", email));
 
             template.upsert(query, update, UserEntity.class);
         } catch (Exception e) {
