@@ -30,5 +30,5 @@ public interface UrlService {
      * @param urlRequest contains the short URL and the new long URL to update.
      * @return the short URL suffix if the update is successful.
      */
-    String updateLongUrl(LongUrlUpdateRequest urlRequest);
+    String updateShortUrl(LongUrlUpdateRequest urlRequest);
 }

@@ -173,7 +173,7 @@ class UrlServiceImplTest {
         UrlServiceImpl urlServiceImpl = new UrlServiceImpl(cache, urlDao, conversion, userService, rateLimiter,
                 distributedCache, new CustomUrlDataAccessImpl(mock(CustomUrlMongoRepository.class)));
         String actualUpdateLongUrlResult = urlServiceImpl
-                .updateLongUrl(new LongUrlUpdateRequest("https://ashish.com/test", 1, "https://ashish.com/test"));
+                .updateShortUrl(new LongUrlUpdateRequest("https://ashish.com/test", 1, "https://ashish.com/test"));
         verify(cache).put(eq("test"), eq("https://ashish.com/test"));
         verify(urlMongoRepository).findDistinctByBaseValue(eq(6967093));
         verify(urlMongoRepository).save(isA(UrlEntity.class));
@@ -201,13 +201,13 @@ class UrlServiceImplTest {
         UrlServiceImpl urlServiceImpl = new UrlServiceImpl(cache, urlDao, conversion, userService, rateLimiter,
                 distributedCache, new CustomUrlDataAccessImpl(mock(CustomUrlMongoRepository.class)));
         assertThrows(UrlNotFoundException.class, () -> urlServiceImpl
-                .updateLongUrl(new LongUrlUpdateRequest("https://ashish.com/test", 1, "https://ashish.com/test")));
+                .updateShortUrl(new LongUrlUpdateRequest("https://ashish.com/test", 1, "https://ashish.com/test")));
         verify(urlMongoRepository).findDistinctByBaseValue(eq(6967093));
     }
 
     @Test
     @Disabled("TODO: Complete this test")
     void testUpdateLongUrl3() {
-        urlServiceImpl.updateLongUrl(new LongUrlUpdateRequest());
+        urlServiceImpl.updateShortUrl(new LongUrlUpdateRequest());
     }
 }

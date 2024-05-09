@@ -95,9 +95,8 @@ public class UrlServiceImpl implements UrlService {
     }
 
     @Override
-    public String updateLongUrl(LongUrlUpdateRequest urlRequest){
-        String[] parts = urlRequest.getShortUrl().split("/");
-        String suffix = parts[parts.length - 1];
+    public String updateShortUrl(LongUrlUpdateRequest urlRequest){
+        String suffix = findUrlSuffix(urlRequest.getShortUrl());
         Integer baseValue = conversion.decode(suffix);
         Optional<UrlEntity> urlEntity = urlDao.findByBasePath(baseValue);
         if(urlEntity.isPresent()){
@@ -107,12 +106,29 @@ public class UrlServiceImpl implements UrlService {
                     .ifPresent(expiry -> existingObj.setExpiry(LocalDateTime.now().plusDays((long)urlRequest.getExpiry())));
             urlDao.upsertUrl(existingObj);
             cache.put(suffix,urlRequest.getUrl());
-            LOGGER.info("[updateLongUrl]: updated long url for suffix : {} is : {}" , suffix, urlRequest.getUrl());
+            LOGGER.info("[updateShortUrl]: updated short url for suffix : {} is : {}" , suffix, urlRequest.getUrl());
             return shortUrlString(suffix);
         }else{
-            LOGGER.info("[updateLongUrl]: updated long url for suffix : {} is : {}" , suffix, urlRequest.getUrl());
-            throw new UrlNotFoundException(StringConstants.Error.URL_NOT_FOUND, HttpStatus.BAD_REQUEST);
+            return updateCustomShortUrl(urlRequest);
         }
+    }
+
+    private String updateCustomShortUrl(LongUrlUpdateRequest urlRequest) {
+        String suffix = findUrlSuffix(urlRequest.getShortUrl());
+        Optional<CustomUrlEntity> urlEntity = customUrlDataAccess.findByShortSuffix(suffix);
+        if(urlEntity.isPresent()) {
+            CustomUrlEntity existingObj = urlEntity.get();
+            Optional.ofNullable(urlRequest.getUrl()).ifPresent(existingObj::setActualUrl);
+            Optional.ofNullable(urlRequest.getExpiry())
+                    .ifPresent(expiry -> existingObj.setExpiry(LocalDateTime.now().plusDays((long) urlRequest.getExpiry())));
+            customUrlDataAccess.upsertUrl(existingObj);
+            cache.put(suffix, urlRequest.getUrl());
+            LOGGER.info("[updateCustomShortUrl]: updated long url for suffix : {} is : {}", suffix, urlRequest.getUrl());
+            return shortUrlString(suffix);
+        } else{
+            LOGGER.info("[updateCustomShortUrl]: updated long url for suffix : {} is : {}" , suffix, urlRequest.getUrl());
+            throw new UrlNotFoundException(StringConstants.Error.URL_NOT_FOUND, HttpStatus.BAD_REQUEST);
+            }
     }
 
     /**
@@ -216,6 +232,11 @@ public class UrlServiceImpl implements UrlService {
                     StringConstants.Error.INVALID_LONG_URL, request.getUrl());
             throw new UrlCreationException(StringConstants.Error.INVALID_LONG_URL, HttpStatus.BAD_REQUEST);
         }
+    }
+
+    private String findUrlSuffix(String shortUrl){
+        String[] parts = shortUrl.split("/");
+        return parts[parts.length - 1];
     }
 
 }

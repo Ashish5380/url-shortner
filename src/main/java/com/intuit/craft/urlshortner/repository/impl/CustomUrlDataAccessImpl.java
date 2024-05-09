@@ -1,11 +1,13 @@
 package com.intuit.craft.urlshortner.repository.impl;
 
+import com.intuit.craft.urlshortner.exceptions.service.DatabaseException;
 import com.intuit.craft.urlshortner.models.bo.ShortenUrlBO;
 import com.intuit.craft.urlshortner.models.entity.CustomUrlEntity;
 import com.intuit.craft.urlshortner.models.entity.UrlEntity;
 import com.intuit.craft.urlshortner.repository.CustomUrlDataAccess;
 import com.intuit.craft.urlshortner.repository.mongo.CustomUrlMongoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -38,5 +40,14 @@ public class CustomUrlDataAccessImpl implements CustomUrlDataAccess {
     @Override
     public Optional<CustomUrlEntity> findByShortSuffix(String suffix){
         return urlMongoRepository.findDistinctByShortUrl(suffix);
+    }
+
+    @Override
+    public void upsertUrl(CustomUrlEntity urlEntity){
+        try{
+            urlMongoRepository.save(urlEntity);
+        }catch (Exception e){
+            throw new DatabaseException("Problem saving info to datasource", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

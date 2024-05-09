@@ -46,7 +46,7 @@ public class UrlController implements UrlApi {
 
     @Override
     public ResponseEntity<?> updateShortenedUrl(LongUrlUpdateRequest request) {
-        return new ResponseEntity<>(urlService.updateLongUrl(request),HttpStatus.OK);
+        return new ResponseEntity<>(urlService.updateShortUrl(request),HttpStatus.OK);
 
     }
 }

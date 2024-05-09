@@ -1,10 +1,12 @@
 package com.intuit.craft.urlshortner.repository.impl;
 
+import com.intuit.craft.urlshortner.exceptions.service.DatabaseException;
 import com.intuit.craft.urlshortner.models.bo.ShortenUrlBO;
 import com.intuit.craft.urlshortner.models.entity.UrlEntity;
 import com.intuit.craft.urlshortner.repository.UrlDataAccess;
 import com.intuit.craft.urlshortner.repository.mongo.UrlMongoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
 import javax.swing.text.html.Option;
@@ -42,6 +44,11 @@ public class UrlDataAccessImpl implements UrlDataAccess {
 
     @Override
     public void upsertUrl(UrlEntity urlEntity){
-        urlMongoRepository.save(urlEntity);
+        try{
+            urlMongoRepository.save(urlEntity);
+        }catch (Exception e){
+            throw new DatabaseException("Problem saving info to datasource", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 }
