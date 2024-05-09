@@ -105,7 +105,7 @@ public class UrlServiceImpl implements UrlService {
             Optional.ofNullable(urlRequest.getExpiry())
                     .ifPresent(expiry -> existingObj.setExpiry(LocalDateTime.now().plusDays((long)urlRequest.getExpiry())));
             urlDao.upsertUrl(existingObj);
-            cache.put(suffix,urlRequest.getUrl());
+            cache.delete(suffix);
             LOGGER.info("[updateShortUrl]: updated short url for suffix : {} is : {}" , suffix, urlRequest.getUrl());
             return shortUrlString(suffix);
         }else{
@@ -113,6 +113,11 @@ public class UrlServiceImpl implements UrlService {
         }
     }
 
+    /**
+     * Updates the long URL corresponding to a given custom short URL suffix.
+     * @param urlRequest contains the short URL and the new long URL to update.
+     * @return the short URL suffix if the update is successful
+     */
     private String updateCustomShortUrl(LongUrlUpdateRequest urlRequest) {
         String suffix = findUrlSuffix(urlRequest.getShortUrl());
         Optional<CustomUrlEntity> urlEntity = customUrlDataAccess.findByShortSuffix(suffix);
@@ -122,7 +127,7 @@ public class UrlServiceImpl implements UrlService {
             Optional.ofNullable(urlRequest.getExpiry())
                     .ifPresent(expiry -> existingObj.setExpiry(LocalDateTime.now().plusDays((long) urlRequest.getExpiry())));
             customUrlDataAccess.upsertUrl(existingObj);
-            cache.put(suffix, urlRequest.getUrl());
+            cache.delete(suffix);
             LOGGER.info("[updateCustomShortUrl]: updated long url for suffix : {} is : {}", suffix, urlRequest.getUrl());
             return shortUrlString(suffix);
         } else{
